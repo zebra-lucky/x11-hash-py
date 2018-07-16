@@ -19,6 +19,7 @@ def to64s(u): return -((~u & M64) + 1) if u & S64 else u & M64
 def to64u(s): return s & M64
 def rshift32b(val, n): return (val % R32) >> n  # logical right shift 32-bit
 def rshift64b(val, n): return (val % R64) >> n  # logical right shift 64-bit
+def rotl32(x, c): return ((x << c) | rshift32b(x, 32 - c)) & M32
 
 
 def buffer_insert(buf, offset, data, data_len=None):
@@ -28,11 +29,27 @@ def buffer_insert(buf, offset, data, data_len=None):
         buf[i+offset] = data[i]
 
 
+def buffer_xor_insert(buf, offset, data, doffset, data_len=None):
+    if data_len is None:
+        data_len = len(data)
+    for i in range(data_len):
+        buf[i+offset] ^= data[i+doffset]
+
+
 def buffer_insert_u64(buf, offset, data, data_len=None):
     if data_len is None:
         data_len = len(data)
     for i in range(data_len):
         buf[i+offset] = data[i].clone()
+
+
+def bytes_to_i32_list(buf):
+    i32l = []
+    buf_len = len(buf)
+    for i in range(buf_len//4):
+        i32v = unpack('>I', buf[i*4:i*4+4])[0]
+        i32l.append(i32v)
+    return i32l
 
 
 def bytes_to_u64_list(buf, buf_len):
@@ -61,6 +78,10 @@ def swap32(val):
         ((val & 0xFF00) << 8) |
         (rshift32b(val, 8) & 0xFF00) |
         (rshift32b(val, 24) & 0xFF))
+
+
+def swap32_list(l):
+    return list(map(swap32, l))
 
 
 class u64(object):

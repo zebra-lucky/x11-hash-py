@@ -340,7 +340,6 @@ def bmw_close(ctx):
         v = u + 8
         out[2 * u] = op.swap32(h1[v].lo)
         out[2 * u + 1] = op.swap32(h1[v].hi)
-
     return out
 
 
@@ -355,7 +354,7 @@ def bmw(msg):
     ctx = {}
     ctx['state'] = V_INIT[:]
     ctx['ptr'] = 0
-    ctx['bitCount'] = u64(0,0)
+    ctx['bitCount'] = u64(0, 0)
     ctx['buffer'] = bytearray(128)
     bmw_update(ctx, msg)
     res = bmw_close(ctx)
