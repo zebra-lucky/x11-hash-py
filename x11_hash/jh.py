@@ -331,8 +331,8 @@ def jh_update(ctx, msg, msg_len=None):
         msg_len = len(msg)
     if msg_len < buf_len - ptr:
         op.buffer_insert(buf, ptr, msg, msg_len)
-        ptr += msg.length
-        ctx.ptr = ptr
+        ptr += msg_len
+        ctx['ptr'] = ptr
         return
 
     V = [None] * JH_HX
