@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from builtins import int
@@ -95,6 +94,11 @@ def swap32(val):
 
 def swap32_list(l): return list(map(swap32, l))
 def t32(x): return x & M32
+
+
+def xor_table(d, s1, s2, tlen):
+    for i in range(tlen):
+        d[i] = s1[i] ^ s2[i]
 
 
 class u64(object):
