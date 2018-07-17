@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from builtins import int
-from struct import unpack
+from struct import unpack, pack
 
 
 M32 = 2**32 - 1     # Mask 32-bit
@@ -29,6 +29,12 @@ def buffer_insert(buf, offset, data, data_len=None):
         buf[i+offset] = data[i]
 
 
+def buffer_insert_2d(buf, offset, offset2, data, data_len, data_len2):
+    for i in range(data_len):
+        for j in range(data_len2):
+            buf[i+offset][j+offset2] = data[i][j]
+
+
 def buffer_xor_insert(buf, offset, data, doffset, data_len=None):
     if data_len is None:
         data_len = len(data)
@@ -50,6 +56,13 @@ def bytes_to_i32_list(buf):
         i32v = unpack('>I', buf[i*4:i*4+4])[0]
         i32l.append(i32v)
     return i32l
+
+
+def bytes_from_i32_list(l):
+    res = b''
+    for i32v in l:
+        res += pack('>I', i32v)
+    return res
 
 
 def bytes_to_u64_list(buf, buf_len):
@@ -80,8 +93,8 @@ def swap32(val):
         (rshift32b(val, 24) & 0xFF))
 
 
-def swap32_list(l):
-    return list(map(swap32, l))
+def swap32_list(l): return list(map(swap32, l))
+def t32(x): return x & M32
 
 
 class u64(object):
