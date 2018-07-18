@@ -28,4 +28,4 @@ def getPoWHash(x):
     res = shavite(res)
     res = simd(res)
     res = echo(res)
-    return op.bytes_from_i32_list(res[:32])
+    return res[:32]
