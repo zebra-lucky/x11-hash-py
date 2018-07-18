@@ -1,6 +1,8 @@
+import sys
 from math import log
 from operator import xor
 from copy import deepcopy
+from functools import reduce
 
 # The Keccak-f round constants.
 RoundConstants = [
@@ -23,7 +25,7 @@ RotationConstants = [
 Masks = [(1 << i) - 1 for i in range(65)]
 
 def bits2bytes(x):
-    return (int(x) + 7) / 8
+    return (int(x) + 7) // 8
 
 def rol(value, left, bits):
     """
@@ -92,7 +94,7 @@ def keccak_f(state):
     l = int(log(state.lanew, 2))
     nr = 12 + 2 * l
 
-    for ir in xrange(nr):
+    for ir in range(nr):
         round(state.s, RoundConstants[ir])
 
 class KeccakState(object):
@@ -239,7 +241,10 @@ class KeccakSponge(object):
         self.permfn(self.state)
 
     def absorb(self, s):
-        self.buffer += KeccakState.str2bytes(s)
+        if sys.version_info.major > 2:
+            self.buffer += bytearray(s)
+        else:
+            self.buffer += KeccakState.str2bytes(s)
 
         while len(self.buffer) >= self.state.bitrate_bytes:
             self.absorb_block(self.buffer[:self.state.bitrate_bytes])
@@ -293,10 +298,16 @@ class KeccakHash(object):
         finalised = self.sponge.copy()
         finalised.absorb_final()
         digest = finalised.squeeze(self.digest_size)
-        return KeccakState.bytes2str(digest)
+        if sys.version_info.major > 2:
+            return bytes(digest)
+        else:
+            return KeccakState.bytes2str(digest)
 
     def hexdigest(self):
-        return self.digest().encode('hex')
+        if sys.version_info.major > 2:
+            return self.digest().hex()
+        else:
+            return self.digest().encode('hex')
 
     @staticmethod
     def preset(bitrate_bits, capacity_bits, output_bits):
