@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from struct import pack
-from pprint import pprint
-
 from . import op
 from . import aes
-from .op import u64
 
 
 IV512 = [
@@ -665,20 +661,16 @@ def shavite_close(ctx, ub, n):
     return out
 
 
-def pack_state(state):
-    res = b''
-    for i in state:
-        res += pack('>I', i)
-    return res
-
-
-def shavite(msg):
+def shavite(msg, out_array=False, in_array=False):
     ctx = {}
     ctx['ptr'] = 0
     ctx['count'] = [0] * 4
     ctx['h'] = IV512[:]
     ctx['buffer'] = bytearray(128)
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     shavite_update(ctx, msg)
     res = shavite_close(ctx, 0, 0)
-    res = pack_state(res)
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_i32_list(res)
+    return res

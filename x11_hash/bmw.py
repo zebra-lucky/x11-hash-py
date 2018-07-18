@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from struct import pack
-from pprint import pprint
 
 from . import op
 from .op import u64
@@ -342,20 +341,16 @@ def bmw_close(ctx):
     return out
 
 
-def pack_state(state):
-    res = b''
-    for i in state:
-        res += pack('>I', i)
-    return res
-
-
-def bmw(msg):
+def bmw(msg, out_array=False, in_array=False):
     ctx = {}
     ctx['state'] = V_INIT[:]
     ctx['ptr'] = 0
     ctx['bitCount'] = u64(0, 0)
     ctx['buffer'] = bytearray(128)
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     bmw_update(ctx, msg)
     res = bmw_close(ctx)
-    res = pack_state(res)
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_i32_list(res)
+    return res

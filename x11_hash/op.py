@@ -52,6 +52,14 @@ def buffer_insert_u64(buf, offset, data, data_len=None):
         buf[i+offset] = data[i].clone()
 
 
+def u64_to_i32_list(buf):
+    res = []
+    for u64v in buf:
+        res.append(u64v.hi)
+        res.append(u64v.lo)
+    return res
+
+
 def bytes_to_i32_list(buf):
     i32l = []
     buf_len = len(buf)
@@ -76,6 +84,14 @@ def bytes_to_u64_list(buf, buf_len):
         u64v = u64(hi, lo)
         buf64.append(u64v)
     return buf64
+
+
+def bytes_from_u64_list(state):
+    res = b''
+    for u64v in state:
+        res += pack('>I', u64v.hi)
+        res += pack('>I', u64v.lo)
+    return res
 
 
 def bytes_to_u64_list_le(buf, buf_len):

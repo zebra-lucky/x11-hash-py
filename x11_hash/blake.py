@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from struct import pack
-from pprint import pprint
 
 from . import op
 from .op import u64
@@ -172,15 +171,7 @@ def blake_close(ctx):
         blake_update(ctx, buf)
 
 
-def pack_state(state):
-    res = b''
-    for u64v in state:
-        res += pack('>I', u64v.hi)
-        res += pack('>I', u64v.lo)
-    return res
-
-
-def blake(msg):
+def blake(msg, out_array=False, in_array=False):
     ctx = {}
     ctx['state'] = initial_values[:]
     ctx['salt'] = [u64(0, 0), u64(0, 0), u64(0, 0), u64(0, 0)]
@@ -188,7 +179,12 @@ def blake(msg):
     ctx['T1'] = u64(0, 0)
     ctx['ptr'] = 0
     ctx['buffer'] = bytearray(128)
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     blake_update(ctx, msg)
     blake_close(ctx)
-    res = pack_state(ctx['state'])
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_u64_list(ctx['state'])
+    else:
+        res = op.u64_to_i32_list(ctx['state'])
+    return res

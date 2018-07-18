@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from struct import pack
-from pprint import pprint
 
 from . import op
 from .op import u64
@@ -1232,14 +1231,7 @@ def groestl_close(ctx):
     return out
 
 
-def pack_state(state):
-    res = b''
-    for i in state:
-        res += pack('>I', i)
-    return res
-
-
-def groestl(msg):
+def groestl(msg, out_array=False, in_array=False):
     ctx = {}
     state = [None] * 16
     for i in range(15):
@@ -1249,7 +1241,10 @@ def groestl(msg):
     ctx['ptr'] = 0
     ctx['count'] = u64(0, 0)
     ctx['buffer'] = bytearray(128)
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     groestl_update(ctx, msg)
     res = groestl_close(ctx)
-    res = pack_state(res)
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_i32_list(res)
+    return res

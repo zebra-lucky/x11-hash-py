@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from struct import pack
-from pprint import pprint
-
 from . import aes
 from . import op
-from .op import u64
 
 
 ECHO_BlockSize = 128
@@ -251,17 +247,13 @@ def echo_close(ctx):
     return out
 
 
-def pack_state(state):
-    res = b''
-    for i in state:
-        res += pack('>I', i)
-    return res
-
-
-def echo(msg):
+def echo(msg, out_array=False, in_array=False):
     ctx = {}
     echoInit(ctx)
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     echo_update(ctx, msg)
     res = echo_close(ctx)
-    res = pack_state(res)
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_i32_list(res)
+    return res

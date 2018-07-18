@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from struct import pack
-from pprint import pprint
-
 from . import op
-from .op import u64
 
 
 Cubehash_BlockSize = 32
@@ -305,19 +301,15 @@ def cubehash_close(ctx):
     return out
 
 
-def pack_state(state):
-    res = b''
-    for i in state:
-        res += pack('>I', i)
-    return res
-
-
-def cubehash(msg):
+def cubehash(msg, out_array=False, in_array=False):
     ctx = {}
     ctx['state'] = IV512[:]
     ctx['ptr'] = 0
     ctx['buffer'] = bytearray(Cubehash_BlockSize)
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     cubehash_update(ctx, msg)
     res = cubehash_close(ctx)
-    res = pack_state(res)
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_i32_list(res)
+    return res

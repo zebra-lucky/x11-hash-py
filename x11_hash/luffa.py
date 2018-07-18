@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from struct import pack
-from pprint import pprint
-
 from . import op
-from .op import u64
 
 
 V_INIT = [
@@ -424,19 +420,15 @@ def luffa5_close(ctx, ub, n):
     return out
 
 
-def pack_state(state):
-    res = b''
-    for i in state:
-        res += pack('>I', i)
-    return res
-
-
-def luffa5(msg):
+def luffa5(msg, out_array=False, in_array=False):
     ctx = {}
     ctx['state'] = V_INIT
     ctx['ptr'] = 0
     ctx['buffer'] = bytearray(32)
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     luffa5_update(ctx, msg)
     res = luffa5_close(ctx, 0, 0)
-    res = pack_state(res)
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_i32_list(res)
+    return res

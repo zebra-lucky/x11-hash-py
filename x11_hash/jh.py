@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from struct import pack
-from pprint import pprint
-
 from . import op
-from .op import u64
 
 
 Jh_BlockSize = 64
@@ -388,21 +384,17 @@ def jh_close(ctx):
     return out
 
 
-def pack_state(state):
-    res = b''
-    for i in state:
-        res += pack('>I', i)
-    return res
-
-
-def jh(msg):
+def jh(msg, out_array=False, in_array=False):
     ctx = {}
     ctx['state'] = op.swap32_list(IV512)
     ctx['ptr'] = 0
     ctx['buffer'] = bytearray(Jh_BlockSize)
     ctx['blockCountHigh'] = 0
     ctx['blockCountLow'] = 0
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     jh_update(ctx, msg)
     res = jh_close(ctx)
-    res = pack_state(res)
-    pprint(res.hex())
+    if not out_array:
+        res = op.bytes_from_i32_list(res)
+    return res

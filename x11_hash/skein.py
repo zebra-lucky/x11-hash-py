@@ -2,13 +2,12 @@
 # from http://www.h2database.com/skein/
 # Released under the public domain
 
-from struct import pack
-from pprint import pprint
-
 from . import op
 
 
-def skein(msg):
+def skein(msg, out_array=False, in_array=False):
+    if in_array:
+        msg = op.bytes_from_i32_list(msg)
     # final: 0x80; first: 0x40; conf: 0x4; msg: 0x30; out: 0x3f
     msg_len = len(msg)
     msg = bytearray(msg)
@@ -42,7 +41,11 @@ def skein(msg):
     for i in range(64):
         b = (shiftRight(c[i >> 3], (i & 7) * 8)[1] & 255)
         out_hash.append(b)
-    print(bytes(out_hash).hex())
+    if out_array:
+        res = op.bytes_to_i32_list(bytes(out_hash))
+    else:
+        res = bytes(out_hash)
+    return res
 
 
 def shiftLeft(x, n):
