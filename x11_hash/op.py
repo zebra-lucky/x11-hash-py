@@ -21,11 +21,15 @@ def rshift64b(val, n): return (val % R64) >> n  # logical right shift 64-bit
 def rotl32(x, c): return ((x << c) | rshift32b(x, 32 - c)) & M32
 
 
-def buffer_insert(buf, offset, data, data_len=None):
+def buffer_insert(buf, offset, data, data_len=None, d_offset=0):
     if data_len is None:
         data_len = len(data)
-    for i in range(data_len):
-        buf[i+offset] = data[i]
+    if d_offset == 0:
+        for i in range(data_len):
+            buf[i+offset] = data[i]
+    else:
+        for i in range(data_len):
+            buf[i+offset] = data[i+d_offset]
 
 
 def buffer_insert_2d(buf, offset, offset2, data, data_len, data_len2):
