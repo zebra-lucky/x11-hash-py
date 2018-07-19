@@ -17,7 +17,7 @@ setup(
         'x11_hash_py'
     ],
     package_dir={
-        'electrum_dash': 'x11_hash_py',
+        'x11_hash_py': 'x11_hash_py',
     },
     test_suite='x11_hash_py.tests.test_hashes',
     description=description,
